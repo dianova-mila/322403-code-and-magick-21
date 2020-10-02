@@ -10,17 +10,29 @@ const TEXT_HEIGHT = 20;
 const BAR_WIDTH = 40;
 const BAR_GAP = 50;
 const MAX_BAR_HEIGHT = 150;
-const font = {
+const TEXT_FONT = {
   SIZE: `16px`,
   FAMILY: `PT Mono`,
 };
-
-let renderCloud = function (ctx, x, y, color) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
+const BAR_COLOR = {
+  HUE: 240,
+  SATURATION: 0,
+  LIGHTNESS: 30,
+  ALPHA: 1,
 };
 
-let getMaxElement = function (arr) {
+const renderRect = function (ctx, x, y, width, height, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, width, height);
+};
+
+const renderText = function (ctx, text, x, y, color, fontSize, fontFamily) {
+  ctx.font = `${fontSize} ${fontFamily}`;
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+};
+
+const getMaxElement = function (arr) {
   let maxElement = arr[0];
 
   for (let i = 1; i < arr.length; i++) {
@@ -32,51 +44,71 @@ let getMaxElement = function (arr) {
   return maxElement;
 };
 
-let getRandomInt = function (max) {
-  return Math.floor(Math.random() * Math.floor(max));
+const getBarColor = function (name) {
+  let saturation = Math.floor(Math.random() * Math.floor(101));
+
+  if (name === `Вы`) {
+    return `rgba(255, 0, 0, 1)`;
+  }
+  return `hsla(${BAR_COLOR.HUE}, ${saturation}%, ${BAR_COLOR.LIGHTNESS}%, ${BAR_COLOR.ALPHA})`;
 };
 
 window.renderStatistics = function (ctx, names, times) {
-  renderCloud(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, `rgba(0, 0, 0, 0.3)`);
-  renderCloud(ctx, CLOUD_X, CLOUD_Y, `#fff`);
+  renderRect(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, CLOUD_WIDTH, CLOUD_HEIGHT, `rgba(0, 0, 0, 0.3)`);
+  renderRect(ctx, CLOUD_X, CLOUD_Y, CLOUD_WIDTH, CLOUD_HEIGHT, `#fff`);
 
-  ctx.fillStyle = `#000`;
+  renderText(
+      ctx,
+      `Ура вы победили!`,
+      CLOUD_X + TEXT_GAP,
+      CLOUD_Y + TEXT_GAP,
+      `#000`,
+      TEXT_FONT.SIZE,
+      TEXT_FONT.FAMILY
+  );
 
-  ctx.font = `${font.SIZE} ${font.FAMILY}`;
-  ctx.fillText(`Ура вы победили!`, CLOUD_X + TEXT_GAP, CLOUD_Y + TEXT_GAP);
-  ctx.fillText(`Список результатов:`, CLOUD_X + TEXT_GAP, CLOUD_Y + TEXT_GAP + TEXT_HEIGHT);
+  renderText(
+      ctx,
+      `Список результатов:`,
+      CLOUD_X + TEXT_GAP,
+      CLOUD_Y + TEXT_GAP + TEXT_HEIGHT,
+      `#000`,
+      TEXT_FONT.SIZE,
+      TEXT_FONT.FAMILY
+  );
 
   let maxTime = getMaxElement(times);
 
   for (let i = 0; i < names.length; i++) {
-    ctx.fillText(
+    renderText(
+        ctx,
         names[i],
         CLOUD_X + BAR_GAP + (BAR_GAP + BAR_WIDTH) * i,
-        CLOUD_HEIGHT - GAP
+        CLOUD_HEIGHT - GAP,
+        `#000`,
+        TEXT_FONT.SIZE,
+        TEXT_FONT.FAMILY
     );
-
-    if (names[i] === `Вы`) {
-      ctx.fillStyle = `rgba(255, 0, 0, 1)`;
-    } else {
-      let barSaturation = getRandomInt(101);
-      ctx.fillStyle = `hsla(240, ${barSaturation}%, 30%, 1)`;
-    }
 
     let barHeight = (MAX_BAR_HEIGHT * times[i]) / maxTime;
 
-    ctx.fillRect(
+    renderRect(
+        ctx,
         CLOUD_X + BAR_GAP + (BAR_GAP + BAR_WIDTH) * i,
         CLOUD_HEIGHT - GAP - TEXT_HEIGHT,
         BAR_WIDTH,
-        -barHeight
+        -barHeight,
+        getBarColor(names[i])
     );
 
-    ctx.fillStyle = `#000`;
-
-    ctx.fillText(
+    renderText(
+        ctx,
         `${Math.round(times[i])}`,
         CLOUD_X + BAR_GAP + (BAR_GAP + BAR_WIDTH) * i,
-        CLOUD_HEIGHT - GAP - TEXT_HEIGHT - barHeight - GAP
+        CLOUD_HEIGHT - GAP - TEXT_HEIGHT - barHeight - GAP,
+        `#000`,
+        TEXT_FONT.SIZE,
+        TEXT_FONT.FAMILY
     );
   }
 };
