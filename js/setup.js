@@ -38,7 +38,7 @@ const getRandomItemFromArray = (array) => array[Math.floor(Math.random() * array
 // Настройка открытия для окна настроек
 
 const onPopupEscPress = (evt) => {
-  if (evt.key === `Escape` && !userNameInput.focus) {
+  if (evt.key === `Escape` && document.activeElement !== userNameInput) {
     evt.preventDefault();
     closePopup();
   }
